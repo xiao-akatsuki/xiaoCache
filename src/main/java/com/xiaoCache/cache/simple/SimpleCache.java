@@ -2,10 +2,9 @@ package com.xiaoCache.cache.simple;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -40,6 +39,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * 写的时候每个key一把锁，降低锁的粒度
      */
     protected final Map<K, Lock> keyLockMap = new ConcurrentHashMap<>();
+
+    /**
+     * 设置超时时间
+     */
+    private final Map<K,Long> TimeOutMap=new HashMap<>();
 
     /**
      * [构造](structure)
@@ -194,4 +198,222 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     public Iterator<Map.Entry<K, V>> iterator() {
         return this.cache.entrySet().iterator();
     }
+
+
+    /**
+     * @Author drh
+     * @Description  zh - 判断Key中的值是否为空，如果不存在返回true，存在返回false
+     * @Description en - Judge whether the value in Key is empty, return true if it does not exist, return false if it exists
+     * @Date 1:14 下午 2021/9/20
+     * @version: V1.0
+     * @Param [key]
+     * @return java.lang.Boolean
+     **/
+    public Boolean isNull(K key){
+        return null == get(key);
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 判断缓存中是否存在key，存在返回true，不存在返回false
+     * @Description en - Determine whether there is a key in the cache, return true if it exists, return false if it does not exist
+     * @Date 1:22 下午 2021/9/20
+     * @Param [key]
+     * @return java.lang.Boolean
+     **/
+    public Boolean hasKey(K key){
+        return this.cache.containsKey(key);
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 获取缓存数量
+     * @Description en - Get the buffer number
+     * @Date 3:25 下午 2021/9/20
+     * @Param []
+     * @return java.lang.Integer
+     **/
+    public Integer length(){
+        return this.cache.size();
+    }
+
+    /**
+     * @Author drh
+     * @Description  zh - 替换数组中的value值
+     * @Description  en - Replace the value in the array
+     * @Date 7:40 上午 2021/9/21
+     * @Param [key, value]
+     * @return V
+     **/
+    public V replace(K key,V value){
+        this.cache.replace(key,value);
+        return value;
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 获取缓存中的所有值
+     * @Description en - Get all the values in the cache
+     * @Date 8:07 上午 2021/9/21
+     * @Param []
+     * @return java.util.List<V>
+     **/
+    public List<V> getAll(){
+        Iterator<Map.Entry<K, V>> iterator = iterator();
+        CopyOnWriteArrayList list=new CopyOnWriteArrayList<>();
+        while(iterator.hasNext()){
+            list.add(iterator.next());
+        }
+        return list;
+    }
+    /**
+     * @Author drh
+     * @Description zh - 设置超时时间
+     * @Description en - Set timeout
+     * @Date 12:18 下午 2021/9/21
+     * @Param [key, value, time]
+     * @return V
+     **/
+    public K setInvalidationTime(K key,long time){
+        if (key==null){
+            return null;
+        }
+        this.TimeOutMap.put(key,System.currentTimeMillis()+time);
+        return key;
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 判断缓存是否超时
+     * @Description en - Determine whether the cache has timed out
+     * @Date 12:21 下午 2021/9/21
+     * @Param [key]
+     * @return k
+     **/
+    public K isTimeOut(K key){
+        if (key==null){
+            return null;
+        }
+        Long time = this.TimeOutMap.get(key);
+        if (time==null) {
+            return null;
+        }
+        if (System.currentTimeMillis()>time){
+            this.TimeOutMap.remove(key);
+            this.cache.remove(key);
+            return key;
+        }
+        return null;
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 获取过期剩余时间
+     * @Description en - Get the remaining time after expiration
+     * @Date 1:04 下午 2021/9/22
+     * @Param [key]
+     * @return java.lang.Long
+     **/
+    public Long TimeLeft(K key){
+        return  TimeOutMap.get(key) == null ? null : TimeOutMap.get(key)-System.currentTimeMillis();
+
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 获取value值的长度
+     * @Description en - Get the length of value
+     * @Date 4:08 下午 2021/9/21
+     * @Param [key]
+     * @return java.lang.Integer
+     **/
+    public Integer getValueSize(K key){
+        return ((String)this.get(key)).getBytes().length;
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 获取多个key的对应值
+     * @Description en - Get the corresponding value of multiple keys
+     * @Date 8:08 上午 2021/9/22
+     * @Param [key]
+     * @return java.util.List<V>
+     **/
+    public List<V> getValues(K... key){
+        CopyOnWriteArrayList list=new CopyOnWriteArrayList<>();
+        for (K k:key){
+            list.add(get(k));
+        }
+
+        return list;
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 将 key 中储存的数字值减一
+     * @Description en - Decrease the numeric value stored in key by on
+     * @Date 10:00 上午 2021/9/22
+     * @Param
+     * @return
+     **/
+    public V Decr(K key){
+        if (get(key) instanceof Number){
+            int v= ((Number) get(key)).intValue()-1;
+            put(key,(V)(Object)v);
+            return (V)(Object)v;
+        }
+        return null;
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 将 key 中储存的数字值加一
+     * @Description en - Add one to the numeric value stored in key
+     * @Date 10:00 上午 2021/9/22
+     * @Param
+     * @return
+     **/
+    public V Incr(K key){
+        if (get(key) instanceof Number){
+            int v= ((Number) get(key)).intValue()+1;
+            put(key,(V)(Object)v);
+            return (V)(Object)v;
+        }
+        return null;
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 将 key 中储存的数字值加任意整型
+     * @Description en - Decrease the numeric value stored in key by on
+     * @Date 10:00 上午 2021/9/22
+     * @Param
+     * @return
+     **/
+    public V IncrInt(K key,Integer i){
+        if (get(key) instanceof Number){
+            int v= ((Number) get(key)).intValue()+i;
+            put(key,(V)(Object)v);
+            return (V)(Object)v;
+        }
+        return null;
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 将 key 中储存的数字值加任意浮点数
+     * @Description en - Add any floating point number to the numeric value stored in the key
+     * @Date 10:00 上午 2021/9/22
+     * @Param
+     * @return
+     **/
+    public V IncrFlot(K key,Float i){
+        if (get(key) instanceof Number){
+            float v= ((Number) get(key)).floatValue()+i;
+            put(key,(V)(Object)v);
+            return (V)(Object)v;
+        }
+        return null;
+    }
+
 }
