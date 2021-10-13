@@ -414,5 +414,47 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
         }
         return null;
     }
+    
+    /**
+     * @Author drh
+     * @Description zh - 获取value的类型
+     * @Description en - Get the type of value
+     * @Date 1:29 下午 2021/10/11
+     * @Param
+     * @return
+     **/
+    public V getType(K key){
+        return (V) get(key).getClass();
+    }
+
+    /**
+     * @Author drh
+     * @Description zh - 重命名key
+     * @Description en - rename key
+     * @Date 2:22 下午 2021/10/11
+     * @Param
+     * @return
+     **/
+    public K Rename(K key,K newKey) throws Exception{
+        if(hasKey(key)){
+           throw new Exception("error: key is null");
+        }
+        put(newKey, get(key));
+        remove(key);
+        return newKey;
+    }
+
+      /**
+     * @Author drh
+     * @Description zh - 获取缓存中的所有key值
+     * @Description en - Get all the key values in the cache
+     * @Date 2:31 下午 2021/10/11
+     * @Param
+     * @return
+     **/
+    public Set getKeys(){
+        return this.cache.keySet();
+    }
+
 
 }
