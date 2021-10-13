@@ -456,5 +456,28 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
         return this.cache.keySet();
     }
 
+    /**
+     * @Author drh
+     * @Description zh - 导出缓存数据，需要在创建Simple Cache时传入Map的实例化对象,默认的weakHashMap无法序列化
+     * @Description en - To export cache data, you need to pass in the instantiated object of Map when creating Simple Cache, the default weakHashMap cannot be serialized
+     * @Date 2:31 下午 2021/10/11
+     * @Param
+     * @return
+     **/
+    public void Export(String ExportPath){
+       StringBuffer stringBuffer=new StringBuffer();
+       ArrayList list=new ArrayList<>(getKeys());
+       for(int i=0;i<list.size();i++){
+           stringBuffer.append("key"+list.get(i)+"value"+this.cache.get(list.get(i))+",");
+       }
+       try {
+        File file=new File(ExportPath);
+        FileWriter fw=new FileWriter(file);
+        fw.write(String.valueOf(stringBuffer));
+        fw.close();    
+       } catch (Exception e) {
+           //TODO: handle exception
+       }
+    }
 
 }
