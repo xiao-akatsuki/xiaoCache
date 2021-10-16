@@ -26,7 +26,6 @@ import com.xiaoCache.cache.simple.method.CacheFun;
  */
 public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializable {
     
-    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
