@@ -1,5 +1,8 @@
 package com.xiaoCache.cache.simple;
 
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
@@ -10,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.xiaoCache.cache.simple.method.CacheFun;
+
 
 
 /**
@@ -201,12 +205,12 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
 
 
     /**
-     * @Author drh
-     * @Description  zh - 判断Key中的值是否为空，如果不存在返回true，存在返回false
-     * @Description en - Judge whether the value in Key is empty, return true if it does not exist, return false if it exists
-     * @Date 1:14 下午 2021/9/20
+     * @author drh
+     * @description  zh - 判断Key中的值是否为空，如果不存在返回true，存在返回false
+     * @description en - Judge whether the value in Key is empty, return true if it does not exist, return false if it exists
+     * @date 1:14 下午 2021/9/20
      * @version: V1.0
-     * @Param [key]
+     * @param [key]
      * @return java.lang.Boolean
      **/
     public Boolean isNull(K key){
@@ -214,11 +218,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 判断缓存中是否存在key，存在返回true，不存在返回false
-     * @Description en - Determine whether there is a key in the cache, return true if it exists, return false if it does not exist
-     * @Date 1:22 下午 2021/9/20
-     * @Param [key]
+     * @author drh
+     * @description zh - 判断缓存中是否存在key，存在返回true，不存在返回false
+     * @description en - Determine whether there is a key in the cache, return true if it exists, return false if it does not exist
+     * @date 1:22 下午 2021/9/20
+     * @param [key]
      * @return java.lang.Boolean
      **/
     public Boolean hasKey(K key){
@@ -226,11 +230,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 获取缓存数量
-     * @Description en - Get the buffer number
-     * @Date 3:25 下午 2021/9/20
-     * @Param []
+     * @author drh
+     * @description zh - 获取缓存数量
+     * @description en - Get the buffer number
+     * @date 3:25 下午 2021/9/20
+     * @param []
      * @return java.lang.Integer
      **/
     public Integer length(){
@@ -238,11 +242,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description  zh - 替换数组中的value值
-     * @Description  en - Replace the value in the array
-     * @Date 7:40 上午 2021/9/21
-     * @Param [key, value]
+     * @author drh
+     * @description  zh - 替换数组中的value值
+     * @description  en - Replace the value in the array
+     * @date 7:40 上午 2021/9/21
+     * @param [key, value]
      * @return V
      **/
     public V replace(K key,V value){
@@ -266,11 +270,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
         return list;
     }
     /**
-     * @Author drh
-     * @Description zh - 设置超时时间
-     * @Description en - Set timeout
-     * @Date 12:18 下午 2021/9/21
-     * @Param [key, value, time]
+     * @author drh
+     * @description zh - 设置超时时间
+     * @description en - Set timeout
+     * @date 12:18 下午 2021/9/21
+     * @param [key, value, time]
      * @return V
      **/
     public K setInvalidationTime(K key,long time){
@@ -282,11 +286,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 判断缓存是否超时
-     * @Description en - Determine whether the cache has timed out
-     * @Date 12:21 下午 2021/9/21
-     * @Param [key]
+     * @author drh
+     * @description zh - 判断缓存是否超时
+     * @description en - Determine whether the cache has timed out
+     * @date 12:21 下午 2021/9/21
+     * @param [key]
      * @return k
      **/
     public K isTimeOut(K key){
@@ -306,11 +310,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 获取过期剩余时间
-     * @Description en - Get the remaining time after expiration
-     * @Date 1:04 下午 2021/9/22
-     * @Param [key]
+     * @author drh
+     * @description zh - 获取过期剩余时间
+     * @description en - Get the remaining time after expiration
+     * @date 1:04 下午 2021/9/22
+     * @param [key]
      * @return java.lang.Long
      **/
     public Long TimeLeft(K key){
@@ -319,11 +323,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 获取value值的长度
-     * @Description en - Get the length of value
-     * @Date 4:08 下午 2021/9/21
-     * @Param [key]
+     * @author drh
+     * @description zh - 获取value值的长度
+     * @description en - Get the length of value
+     * @date 4:08 下午 2021/9/21
+     * @param [key]
      * @return java.lang.Integer
      **/
     public Integer getValueSize(K key){
@@ -331,11 +335,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 获取多个key的对应值
-     * @Description en - Get the corresponding value of multiple keys
-     * @Date 8:08 上午 2021/9/22
-     * @Param [key]
+     * @author drh
+     * @description zh - 获取多个key的对应值
+     * @description en - Get the corresponding value of multiple keys
+     * @date 8:08 上午 2021/9/22
+     * @param [key]
      * @return java.util.List<V>
      **/
     public List<V> getValues(K... key){
@@ -348,11 +352,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 将 key 中储存的数字值减一
-     * @Description en - Decrease the numeric value stored in key by on
-     * @Date 10:00 上午 2021/9/22
-     * @Param
+     * @author drh
+     * @description zh - 将 key 中储存的数字值减一
+     * @description en - Decrease the numeric value stored in key by on
+     * @date 10:00 上午 2021/9/22
+     * @param
      * @return
      **/
     public V Decr(K key){
@@ -365,11 +369,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 将 key 中储存的数字值加一
-     * @Description en - Add one to the numeric value stored in key
-     * @Date 10:00 上午 2021/9/22
-     * @Param
+     * @author drh
+     * @description zh - 将 key 中储存的数字值加一
+     * @description en - Add one to the numeric value stored in key
+     * @date 10:00 上午 2021/9/22
+     * @param
      * @return
      **/
     public V Incr(K key){
@@ -382,11 +386,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 将 key 中储存的数字值加任意整型
-     * @Description en - Decrease the numeric value stored in key by on
-     * @Date 10:00 上午 2021/9/22
-     * @Param
+     * @author drh
+     * @description zh - 将 key 中储存的数字值加任意整型
+     * @description en - Decrease the numeric value stored in key by on
+     * @date 10:00 上午 2021/9/22
+     * @param
      * @return
      **/
     public V IncrInt(K key,Integer i){
@@ -399,11 +403,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 将 key 中储存的数字值加任意浮点数
-     * @Description en - Add any floating point number to the numeric value stored in the key
-     * @Date 10:00 上午 2021/9/22
-     * @Param
+     * @author drh
+     * @description zh - 将 key 中储存的数字值加任意浮点数
+     * @description en - Add any floating point number to the numeric value stored in the key
+     * @date 10:00 上午 2021/9/22
+     * @param
      * @return
      **/
     public V IncrFlot(K key,Float i){
@@ -416,11 +420,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
     
     /**
-     * @Author drh
-     * @Description zh - 获取value的类型
-     * @Description en - Get the type of value
-     * @Date 1:29 下午 2021/10/11
-     * @Param
+     * @author drh
+     * @description zh - 获取value的类型
+     * @description en - Get the type of value
+     * @date 1:29 下午 2021/10/11
+     * @param
      * @return
      **/
     public V getType(K key){
@@ -428,11 +432,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     }
 
     /**
-     * @Author drh
-     * @Description zh - 重命名key
-     * @Description en - rename key
-     * @Date 2:22 下午 2021/10/11
-     * @Param
+     * @author drh
+     * @description zh - 重命名key
+     * @description en - rename key
+     * @date 2:22 下午 2021/10/11
+     * @param
      * @return
      **/
     public K Rename(K key,K newKey) throws Exception{
@@ -444,24 +448,23 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
         return newKey;
     }
 
-      /**
-     * @Author drh
-     * @Description zh - 获取缓存中的所有key值
-     * @Description en - Get all the key values in the cache
-     * @Date 2:31 下午 2021/10/11
-     * @Param
+    /**
+     * @author drh
+     * @description zh - 获取缓存中的所有key值
+     * @description en - Get all the key values in the cache
+     * @date 2:31 下午 2021/10/11
+     * @param
      * @return
      **/
     public Set getKeys(){
         return this.cache.keySet();
     }
-
     /**
-     * @Author drh
-     * @Description zh - 导出缓存数据，需要在创建Simple Cache时传入Map的实例化对象,默认的weakHashMap无法序列化
-     * @Description en - To export cache data, you need to pass in the instantiated object of Map when creating Simple Cache, the default weakHashMap cannot be serialized
-     * @Date 2:31 下午 2021/10/11
-     * @Param
+     * @author drh
+     * @description zh - 导出缓存数据，需要在创建Simple Cache时传入Map的实例化对象,默认的weakHashMap无法序列化
+     * @description en - To export cache data, you need to pass in the instantiated object of Map when creating Simple Cache, the default weakHashMap cannot be serialized
+     * @date 2:31 下午 2021/10/11
+     * @param
      * @return
      **/
     public void Export(String ExportPath){
@@ -477,7 +480,9 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
         fw.close();    
        } catch (Exception e) {
            //TODO: handle exception
+           e.printStackTrace();
        }
     }
 
+    
 }
