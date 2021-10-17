@@ -3,7 +3,6 @@ package com.xiaoCache.cache.simple;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,12 +25,13 @@ import com.xiaoCache.cache.simple.method.CacheFun;
  */
 public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializable {
     
+    
     private static final long serialVersionUID = 1L;
 
     /**
      * 池
      */
-    private final Map<K, V> cache;
+    private  volatile  Map<K, V> cache;
 
     /**
      * 乐观读写锁
@@ -49,15 +49,47 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
     private final Map<K,Long> TimeOutMap=new HashMap<>();
 
     /**
+     * 设置超时
+     */
+    private static final Timer timer=new Timer();
+
+    /**
+     * [内部类]
+     * @description zh - 构建TimerTask
+     * @description en - 
+     * @version V1.0
+     * @author drh
+     * @since 2021-10-17 9:00 
+     */    
+    class SimpleCacheTimer extends TimerTask{
+        private K key;
+        public SimpleCacheTimer(K key){
+            this.key=key;
+        }
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+             cache.remove(key);
+        }
+
+    }
+
+    /**
      * [构造](structure)
      * @description zh - 构造
      * @description en - structure
      * @version V1.0
-     * @author XiaoXunYao
-     * @since 2021-09-20 11:22:09
+     * @author drh
+     * @since 2021-10-17 8:57
      */
     public SimpleCache() {
-        this(new WeakHashMap<>());
+        if(null==cache){
+            synchronized(this){
+                if(null==cache){
+                    cache=new ConcurrentHashMap<>();
+                }
+            }
+        }
     }
 
     /**
@@ -83,7 +115,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @param key: 键
      * @return V
     */
-    public V get(K key){
+    public  V get(K key){
         lock.readLock().lock();
         try {
             return cache.get(key);
@@ -147,6 +179,24 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
         } finally {
             lock.writeLock().unlock();
         }
+        return value;
+    }
+
+    /**
+     * [存入缓存](Cache)
+     * @description: zh - 存入缓存并设置过期时间
+     * @description: en - Store in cache and set expiration time
+     * @version: V1.0
+     * @author drh
+     * @since 2021-10-17 9:54
+     * @param key: 键
+     * @param value: 值
+     * @return V
+    */
+    public V put(K key,V value,Long timeOut){
+        this.cache.put(key, value);
+        timer.schedule(new SimpleCacheTimer(key),timeOut);
+        this.TimeOutMap.put(key,System.currentTimeMillis()+timeOut);
         return value;
     }
 
@@ -280,33 +330,48 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
         if (key==null){
             return null;
         }
+        put(key,cache.get(key),time);
         this.TimeOutMap.put(key,System.currentTimeMillis()+time);
+        
         return key;
     }
-
+   
     /**
      * @author drh
-     * @description zh - 判断缓存是否超时
-     * @description en - Determine whether the cache has timed out
+     * @description zh - 判断缓存是否超时,true未过期，false为未过期
+     * @description en - Judge whether the cache timeout, true is not expired, false is not expired
      * @date 12:21 下午 2021/9/21
      * @param [key]
      * @return k
      **/
-    public K isTimeOut(K key){
+    public Boolean isTimeOut(K key){
         if (key==null){
-            return null;
+             try {
+                throw new Exception("key未null");
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         Long time = this.TimeOutMap.get(key);
         if (time==null) {
-            return null;
+            try {
+                throw new Exception("未设置超时时长");
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
+        System.out.println(1);
         if (System.currentTimeMillis()>time){
             this.TimeOutMap.remove(key);
             this.cache.remove(key);
-            return key;
+            return true;
         }
-        return null;
+        return false;
     }
+    
+
 
     /**
      * @author drh
@@ -481,6 +546,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
            //TODO: handle exception
            e.printStackTrace();
        }
+       
     }
 
     
