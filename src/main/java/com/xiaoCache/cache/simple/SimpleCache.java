@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.xiaoCache.cache.simple.method.CacheFun;
-
+import com.xiaoCache.cache.simple.method.SimpleMethod;
 
 
 /**
@@ -25,7 +25,7 @@ import com.xiaoCache.cache.simple.method.CacheFun;
  */
 public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializable {
     
-
+    
     private static final long serialVersionUID = 1L;
 
     /**
@@ -199,6 +199,56 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
         this.TimeOutMap.put(key,System.currentTimeMillis()+timeOut);
         return value;
     }
+    /**
+     * [存入缓存](Cache)
+     * @description: zh - 存入缓存,对值进行md5加密
+     * @description: en - Store it in the cache and md5 encrypt the value
+     * @version: V1.0
+     * @author drh
+     * @since 2021-10-20 10:44
+     * @param key: 键
+     * @param value: 值
+     * @return V
+     */
+    public V putForMd5(K key,V value){
+        String s = SimpleMethod.md5((String) value);
+        put(key, (V) s);
+        return (V) s;
+    }
+    /**
+     * [存入缓存](Cache)
+     * @description: zh - 存入缓存,对值进行md5加密,并设置过期时间
+     * @description: en - Store it in the cache, encrypt the value with md5, and set the expiration time
+     * @version: V1.0
+     * @author drh
+     * @since 2021-10-20 10:44
+     * @param key: 键
+     * @param value: 值
+     * @return V
+     */
+    public V putForMd5WithTime(K key,V value,long timeOut){
+        String s = SimpleMethod.md5((String) value);
+        put(key, (V) s,timeOut);
+        return (V) s;
+    }
+    /**
+     * [存入缓存](Cache)
+     * @description: zh - 判断值是否与加密过的值相同
+     * @description: en - Determine whether the value is the same as the encrypted value
+     * @version: V1.0
+     * @author drh
+     * @since 2021-10-20 10:51
+     * @param key: 键
+     * @param value: 值
+     * @return V
+     */
+    public boolean isRightForMd5(K key,V value) throws IllegalAccessException {
+        if (null==value){
+         throw new IllegalAccessException("value is null");
+        }
+        V v = get(key);
+        return SimpleMethod.md5((String) v).equals(SimpleMethod.md5((String) value));
+    }
 
     /**
      * [移除缓存](Remove cache)
@@ -259,7 +309,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @description en - Judge whether the value in Key is empty, return true if it does not exist, return false if it exists
      * @date 1:14 下午 2021/9/20
      * @version: V1.0
-     * @param [key]
+     * @param
      * @return java.lang.Boolean
      **/
     public Boolean isNull(K key){
@@ -271,7 +321,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @description zh - 判断缓存中是否存在key，存在返回true，不存在返回false
      * @description en - Determine whether there is a key in the cache, return true if it exists, return false if it does not exist
      * @date 1:22 下午 2021/9/20
-     * @param [key]
+     * @param
      * @return java.lang.Boolean
      **/
     public Boolean hasKey(K key){
@@ -283,7 +333,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @description zh - 获取缓存数量
      * @description en - Get the buffer number
      * @date 3:25 下午 2021/9/20
-     * @param []
+     * @param
      * @return java.lang.Integer
      **/
     public Integer length(){
@@ -295,7 +345,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @description  zh - 替换数组中的value值
      * @description  en - Replace the value in the array
      * @date 7:40 上午 2021/9/21
-     * @param [key, value]
+     * @param
      * @return V
      **/
     public V replace(K key,V value){
@@ -323,7 +373,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @description zh - 设置超时时间
      * @description en - Set timeout
      * @date 12:18 下午 2021/9/21
-     * @param [key, value, time]
+     * @param
      * @return V
      **/
     public K setInvalidationTime(K key,long time){
@@ -341,7 +391,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @description zh - 判断缓存是否超时,true未过期，false为未过期
      * @description en - Judge whether the cache timeout, true is not expired, false is not expired
      * @date 12:21 下午 2021/9/21
-     * @param [key]
+     * @param
      * @return k
      **/
     public Boolean isTimeOut(K key){
@@ -378,12 +428,11 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @description zh - 获取过期剩余时间
      * @description en - Get the remaining time after expiration
      * @date 1:04 下午 2021/9/22
-     * @param [key]
+     * @param
      * @return java.lang.Long
      **/
     public Long TimeLeft(K key){
         return  TimeOutMap.get(key) == null ? null : TimeOutMap.get(key)-System.currentTimeMillis();
-
     }
 
     /**
@@ -391,7 +440,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @description zh - 获取value值的长度
      * @description en - Get the length of value
      * @date 4:08 下午 2021/9/21
-     * @param [key]
+     * @param
      * @return java.lang.Integer
      **/
     public Integer getValueSize(K key){
@@ -403,7 +452,7 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
      * @description zh - 获取多个key的对应值
      * @description en - Get the corresponding value of multiple keys
      * @date 8:08 上午 2021/9/22
-     * @param [key]
+     * @param
      * @return java.util.List<V>
      **/
     public List<V> getValues(K... key){
@@ -546,8 +595,8 @@ public class SimpleCache<K, V> implements Iterable<Map.Entry<K, V>>, Serializabl
            //TODO: handle exception
            e.printStackTrace();
        }
-       
     }
 
-    
+
+
 }
